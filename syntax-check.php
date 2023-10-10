@@ -1,17 +1,16 @@
 <?php
 
-define('ERROR', 1);
-define('WARNING', 2);
-define('INFO', 4);
-define('DEBUG', 8);
+require_once __DIR__.'/src/defines.php';
+require_once __DIR__.'/src/environment.php';
+require_once __DIR__.'/src/files.php';
 
 // Defaults.
 $phpextensions = ['php'];
 $msgLevel      = INFO;
 
 // Environment variables.
-if (!empty(getenv('INPUT_PHP_FILE_EXTENSIONS'))) $phpextensions = explode(',', getenv('INPUT_PHP_FILE_EXTENSIONS'));
-if (!empty(getenv('MSGLEVEL'))) $msgLevel = getenv('MSGLEVEL');
+$phpextensions = environment('INPUT_PHP_FILE_EXTENSIONS', $phpextensions);
+$msgLevel      = environment('MSGLEVEL', $msgLevel);
 
 $phpextensions = array_map('strtolower', array_map('trim', $phpextensions));
 
@@ -24,9 +23,8 @@ $counts = [
 $exit   = 0;
 
 // Get all files in the current directory.
-$rdi = new \RecursiveDirectoryIterator('.', \RecursiveDirectoryIterator::SKIP_DOTS);
-$rii = new \RecursiveIteratorIterator($rdi);
-foreach ($rii as $file => $info) {
+$files = getFiles();
+foreach ($files as $file => $info) {
     if (in_array($info->getExtension(), $phpextensions)) {
         logmsg("Checking file: $file", DEBUG);
         $command = sprintf('php -l %s 2>&1', escapeshellarg($file));
