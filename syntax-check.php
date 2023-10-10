@@ -3,6 +3,8 @@
 require_once __DIR__.'/src/defines.php';
 require_once __DIR__.'/src/environment.php';
 require_once __DIR__.'/src/files.php';
+require_once __DIR__.'/src/git.php';
+require_once __DIR__.'/src/output.php';
 
 // Defaults.
 $phpextensions = ['php'];
@@ -11,6 +13,19 @@ $msgLevel      = INFO;
 // Environment variables.
 $phpextensions = environment('INPUT_PHP_FILE_EXTENSIONS', $phpextensions);
 $msgLevel      = environment('MSGLEVEL', $msgLevel);
+$baseRef       = environment('GITHUB_BASE_REF', 'master');
+$headRef       = environment('GITHUB_HEAD_REF', false);
+$event         = environment('GITHUB_EVENT_NAME', false);
+
+if ($headRef === false) {
+    logmsg("No HEAD ref found", ERROR);
+    exit(1);
+}//end if
+
+if ($event === false && !in_array($event, ['push', 'pull_request'])) {
+    logmsg("Invalid event: {$event}", ERROR);
+    exit(1);
+}//end if
 
 $phpextensions = array_map('strtolower', array_map('trim', $phpextensions));
 
@@ -22,9 +37,15 @@ $counts = [
 ];
 $exit   = 0;
 
-// Get all files in the current directory.
 $files = getFiles();
+$limit = [];
+if ($event !== 'push' && $baseRef !== $headRef) {
+    $limit = getChangedFiles($baseRef, $headRef);
+}//end if
+
+logmsg(var_export($limit, true), ERROR);
 foreach ($files as $file => $info) {
+    logmsg("File: ".$info->getPath(), ERROR);
     if (in_array($info->getExtension(), $phpextensions)) {
         logmsg("Checking file: $file", DEBUG);
         $command = sprintf('php -l %s 2>&1', escapeshellarg($file));
@@ -65,41 +86,3 @@ foreach ($files as $file => $info) {
 }//end foreach
 
 exit($exit);
-
-/**
- * Get a line count from a file.
- *
- * @param string $file The file to get the line count from.
- *
- * @return int
- */
-function getLines($file)
-{
-    $lines = 0;
-    exec("wc -l $file", $output);
-    if (!empty($output)) {
-        $lines = (int) trim(explode(' ', $output[0])[0]);
-    }//end if
-
-    return $lines;
-
-}//end getLines()
-
-
-/**
- * Log a message based on the level.
- *
- * @param string $message The message to log.
- * @param int    $level   The level of the message.
- *
- * @return void
- */
-function logmsg($message, $level)
-{
-    global $msgLevel;
-
-    if ($level <= $msgLevel) {
-        echo $message . "\n";
-    }//end if
-
-}//end logmsg()
