@@ -41,10 +41,11 @@ $files = getFiles();
 $limit = [];
 if ($event !== 'push' && $baseRef !== $headRef) {
     $limit = getChangedFiles($baseRef, $headRef);
+    logmsg("Files changed: ".var_export($limit, true), DEBUG);
 }//end if
 
-logmsg(var_export($limit, true), ERROR);
 foreach ($files as $file => $info) {
+        logmsg("Checking file: $file", ERROR);
     $path = substr($info->getPath().'/'.$info->getFilename(), 2);
     if (!in_array($path, $limit)) {
         // Skip files that are not in the limit.
