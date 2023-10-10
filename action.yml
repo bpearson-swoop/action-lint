@@ -27,6 +27,7 @@ runs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ inputs.php-version }}
+        ini-values: "short_open_tag=1"
 
     - name: "Run check script"
       shell: bash
