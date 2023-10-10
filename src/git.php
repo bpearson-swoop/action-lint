@@ -32,7 +32,7 @@ function getChangedFiles($source, $merge)
 function fetch($branch)
 {
     $output  = [];
-    $command = sprintf('git fetch -u origin %s', $branch);
+    $command = sprintf('git fetch -u origin %s 2>/dev/null', $branch);
     exec($command, $output, $return);
 
 }//end fetch()
@@ -48,7 +48,7 @@ function fetch($branch)
 function update($branch)
 {
     $output  = [];
-    $command = sprintf('git pull origin %s', $branch);
+    $command = sprintf('git pull origin %s 2>/dev/null', $branch);
     exec($command, $output, $return);
 
 }//end update()
