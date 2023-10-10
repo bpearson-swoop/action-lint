@@ -13,7 +13,7 @@ function getChangedFiles($source, $merge)
 {
     // By default, the action will do a shallow merge.
     fetch($source);
-    fetch($merge);
+    update($merge);
 
     $files = diff($source, $merge);
 
@@ -36,6 +36,22 @@ function fetch($branch)
     exec($command, $output, $return);
 
 }//end fetch()
+
+
+/**
+ * Update the repository.
+ *
+ * @param string $branch The branch to update.
+ *
+ * @return void
+ */
+function update($branch)
+{
+    $output  = [];
+    $command = sprintf('git pull origin %s', $branch);
+    exec($command, $output, $return);
+
+}//end update()
 
 
 /**

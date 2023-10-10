@@ -1,5 +1,22 @@
 <?php
 
+class RecursiveDotFilterIterator extends \RecursiveFilterIterator
+{
+
+    /**
+     * Check whether the current element of the iterator is acceptable.
+     *
+     * @return bool true if the current element is acceptable, otherwise false.
+     */
+    public function accept()
+    {
+        return substr($this->current()->getFilename(), 0, 1) !== '.';
+
+    }//end accept()
+
+
+}//end class
+
 
 /**
  * Returns an iterator for all files in the current directory.
@@ -9,7 +26,8 @@
 function getFiles()
 {
     $rdi = new \RecursiveDirectoryIterator('.', \RecursiveDirectoryIterator::SKIP_DOTS);
-    $rii = new \RecursiveIteratorIterator($rdi);
+    $rfi = new \RecursiveDotFilterIterator($rdi);
+    $rii = new \RecursiveIteratorIterator($rfi);
 
     return $rii;
 
