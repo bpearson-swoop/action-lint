@@ -45,8 +45,7 @@ if ($event !== 'push' && $baseRef !== $headRef) {
 }//end if
 
 foreach ($files as $file => $info) {
-        logmsg("Checking file: $file", ERROR);
-    $path = substr($info->getPath().'/'.$info->getFilename(), 2);
+    $path = substr($file, 2);
     if (!in_array($path, $limit)) {
         // Skip files that are not in the limit.
         continue;
