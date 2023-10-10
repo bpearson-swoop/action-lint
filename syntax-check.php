@@ -45,7 +45,7 @@ if ($event !== 'push' && $baseRef !== $headRef) {
 
 logmsg(var_export($limit, true), ERROR);
 foreach ($files as $file => $info) {
-    logmsg("File: ".$info->getPath(), ERROR);
+    logmsg("File: ".$info->getPath().'/'.$info->getFilename(), ERROR);
     if (in_array($info->getExtension(), $phpextensions)) {
         logmsg("Checking file: $file", DEBUG);
         $command = sprintf('php -l %s 2>&1', escapeshellarg($file));
